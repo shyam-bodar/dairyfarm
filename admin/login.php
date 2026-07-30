@@ -1,5 +1,5 @@
 <?php
-// require_once __DIR__ . '/../includes/functions.php';
+
 require_once __DIR__ . '/../config/db.php';
 
 if (isset($_SESSION['user_id']) && $_SESSION['role'] == 'admin') {
@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" class="btn btn-primary btn-block">Log In</button>
       </form>
       <p class="form-foot"><a href="<?php echo SITE_URL; ?>index.php" style="color:var(--barn);font-weight:600;">← Back to website</a></p>
-      <p class="form-foot" style="font-size:.78rem;">Default: admin@dairyfarm.com / admin123</p>
+      <!-- <p class="form-foot" style="font-size:.78rem;">Default: admin@dairyfarm.com / admin123</p> -->
     </div>
   </div>
 </body>
