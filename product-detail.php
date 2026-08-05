@@ -11,20 +11,46 @@ if (!$product) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
+
     $qty = (int)($_POST['qty'] ?? 1);
-    if ($qty < 1) $qty = 1;
-    if (!isset($_SESSION['cart'])) $_SESSION['cart'] = array();
+
+    if ($qty < 1) {
+        $qty = 1;
+    }
+
+    /* Stock કરતાં વધુ Quantity ન જાય */
+    if ($qty > $product['stock']) {
+        $qty = $product['stock'];
+    }
+
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = array();
+    }
+
     if (isset($_SESSION['cart'][$id])) {
-        $_SESSION['cart'][$id]['qty'] += $qty;
+
+        $newQty = $_SESSION['cart'][$id]['qty'] + $qty;
+
+        /* Cart ની Total Quantity પણ Stock કરતાં વધુ ન થાય */
+        if ($newQty > $product['stock']) {
+            $newQty = $product['stock'];
+        }
+
+        $_SESSION['cart'][$id]['qty'] = $newQty;
+
     } else {
+
         $_SESSION['cart'][$id] = array(
             'name'  => $product['name'],
             'price' => $product['price'],
             'unit'  => $product['unit'],
             'qty'   => $qty
         );
+
     }
+
     $_SESSION['flash']['cart'] = $product['name'] . ' added to cart!';
+
     header('Location: cart.php');
     exit;
 }
@@ -61,7 +87,12 @@ $relRes = mysqli_query($conn, "SELECT * FROM products WHERE category='" . mysqli
         <form method="post" style="display:flex;gap:14px;align-items:center;margin-top:20px;flex-wrap:wrap;">
           <div class="qty-box" style="background:var(--white);border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;">
             <button type="button" class="qty-minus" style="border:none;background:none;font-size:1.1rem;cursor:pointer;">−</button>
-            <input type="number" name="qty" value="1" min="1">
+          <input
+                  type="number"
+                  name="qty"
+                  value="1"
+                  min="1"
+                  max="<?php echo $product['stock']; ?>">
             <button type="button" class="qty-plus" style="border:none;background:none;font-size:1.1rem;cursor:pointer;">+</button>
           </div>
           <button type="submit" name="add_to_cart" class="btn btn-primary" <?php if($product['stock']<=0) echo 'disabled'; ?>>Add to Cart</button>

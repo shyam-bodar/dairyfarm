@@ -3,9 +3,15 @@ require_once __DIR__ . '/config/db.php';
 $pageTitle = 'Home';
 require_once __DIR__ . '/includes/header.php';
 
-
+// Featured Products
 $result = mysqli_query($conn, "SELECT * FROM products WHERE status='active' ORDER BY created_at DESC LIMIT 4");
-$featured = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
+
+$featured = [];
+
+if($result){
+    $featured = mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
 ?>
 
 <section class="hero">
@@ -63,42 +69,85 @@ $featured = $result ? mysqli_fetch_all($result, MYSQLI_ASSOC) : [];
 </section>
 
 <section class="section section-cream">
-  <div class="container">
-    <div class="center" style="max-width:600px;margin:0 auto 40px;">
-      <span class="eyebrow">Best Sellers</span>
-      <h2>Fresh off the farm today</h2>
-    </div>
+    <div class="container">
 
-    <div class="center" style="margin-top:36px;">
-      <a href="products.php" class="btn btn-outline">View All Products</a>
-    </div>
-  </div>
-</section>
+        <div class="center" style="margin-bottom:40px;">
+            <span class="eyebrow">Best Sellers</span>
+            <h2>Fresh off the farm today</h2>
+        </div>
 
-<section class="section">
-  <div class="container">
-    <div class="center" style="max-width:600px;margin:0 auto 40px;">
-      <span class="eyebrow">Testimonials</span>
-      <h2>What our customers say</h2>
+        <div class="grid grid-4">
+
+            <?php if(!empty($featured)){ ?>
+
+                <?php foreach($featured as $product){ ?>
+
+                    <div class="product-card">
+
+                        <div class="product-thumb">
+
+                            <img src="assets/images/products/<?php echo $product['image']; ?>"
+                                 alt="<?php echo htmlspecialchars($product['name']); ?>">
+
+                            <span class="product-cat">
+                                <?php echo htmlspecialchars($product['category']); ?>
+                            </span>
+
+                        </div>
+
+                        <div class="product-body">
+
+                            <h3><?php echo htmlspecialchars($product['name']); ?></h3>
+
+                            <p class="desc">
+                                <?php
+                                echo substr(strip_tags($product['description']),0,80);
+                                ?>...
+                            </p>
+
+                            <div class="product-price-row">
+
+                                <div>
+                                    <span class="price">
+                                        ₹<?php echo number_format($product['price'],2); ?>
+                                    </span>
+                                    <br>
+                                    <span class="unit">
+                                        <?php echo $product['unit']; ?>
+                                    </span>
+                                </div>
+
+                                <?php if($product['stock']<=5){ ?>
+
+                                    <span class="stock-low">
+                                        Only <?php echo $product['stock']; ?> Left
+                                    </span>
+
+                                <?php } ?>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                <?php } ?>
+
+            <?php } else { ?>
+
+                <p>No Products Available</p>
+
+            <?php } ?>
+
+        </div>
+
+        <div class="center" style="margin-top:40px;">
+            <a href="products.php" class="btn btn-outline">
+                View All Products
+            </a>
+        </div>
+
     </div>
-    <div class="grid grid-3">
-      <div class="testimonial">
-        <div class="stars">★★★★★</div>
-        <p>"The milk tastes completely different — creamier and genuinely fresh. We've stopped buying from the supermarket."</p>
-        <div class="testi-author"><span class="avatar">R</span><div><strong>Riya Shah</strong><br><span style="font-size:.8rem;color:var(--muted);">Jamnagar</span></div></div>
-      </div>
-      <div class="testimonial">
-        <div class="stars">★★★★★</div>
-        <p>"Their ghee is exactly how my grandmother used to make it. Aromatic, golden, and never disappoints."</p>
-        <div class="testi-author"><span class="avatar">K</span><div><strong>Kunal Patel</strong><br><span style="font-size:.8rem;color:var(--muted);">Rajkot</span></div></div>
-      </div>
-      <div class="testimonial">
-        <div class="stars">★★★★★</div>
-        <p>"Delivery is always on time and the team is super responsive whenever I need to adjust my order."</p>
-        <div class="testi-author"><span class="avatar">S</span><div><strong>Sneha Joshi</strong><br><span style="font-size:.8rem;color:var(--muted);">Jamnagar</span></div></div>
-      </div>
-    </div>
-  </div>
 </section>
 
 <section class="section-sm" style="background:var(--pasture);color:#fff;border-radius:30px;width:92%;max-width:1180px;margin:0 auto 60px;text-align:center;padding:50px 30px;">

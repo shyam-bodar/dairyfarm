@@ -35,7 +35,10 @@ $catRes  = mysqli_query($conn, "SELECT DISTINCT category FROM products WHERE sta
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <a href="products.php" class="btn btn-sm <?php echo $category==''?'btn-primary':'btn-outline'; ?>">All</a>
         <?php while ($cat = mysqli_fetch_assoc($catRes)): ?>
-          <a href="products.php?category=<?php echo urlencode($cat['category']); ?>" class="btn btn-sm <?php echo $category==$cat['category']?'btn-primary':'btn-outline'; ?>"><?php echo htmlspecialchars($cat['category'] ?? '', ENT_QUOTES, 'UTF-8'); ?></a>
+         <a href="products.php?category=<?php echo urlencode($cat['category']); ?>&q=<?php echo urlencode($search); ?>"
+   class="btn btn-sm <?php echo ($category == $cat['category']) ? 'btn-primary' : 'btn-outline'; ?>">
+    <?php echo htmlspecialchars($cat['category'], ENT_QUOTES, 'UTF-8'); ?>
+</a>
         <?php endwhile; ?>
       </div>
       <div style="display:flex;gap:8px;">

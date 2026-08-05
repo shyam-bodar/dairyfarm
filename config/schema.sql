@@ -61,12 +61,5 @@ CREATE TABLE contacts (
 INSERT INTO users (name, email, phone, password, role) VALUES
 ('Admin', 'admin@dairyfarm.com', '9999999999', 'admin123', 'admin');
 
-INSERT INTO products (name, category, description, price, unit, stock, image) VALUES
-('Fresh Cow Milk', 'Milk', 'Pure, farm-fresh cow milk delivered daily, rich in calcium and protein.', 60.00, 'Litre', 100, 'milk-cow.jpg'),
-('Buffalo Milk', 'Milk', 'Creamy, high-fat buffalo milk perfect for sweets and tea.', 70.00, 'Litre', 80, 'milk-buffalo.jpg'),
-('Pure Ghee', 'Ghee', 'Traditional bilona-method clarified butter, aromatic and golden.', 650.00, '500g Jar', 40, 'ghee.jpg'),
-('Fresh Paneer', 'Paneer', 'Soft, homemade cottage cheese made fresh every morning.', 320.00, 'Kg', 30, 'paneer.jpg'),
-('Curd / Dahi', 'Curd', 'Thick, naturally set curd made from full-cream milk.', 80.00, 'Kg', 60, 'curd.jpg'),
-('White Butter', 'Butter', 'Unsalted, hand-churned white butter with rich texture.', 420.00, '500g', 25, 'butter.jpg'),
-('Flavoured Lassi', 'Beverages', 'Refreshing sweet lassi made with farm curd and real fruit.', 50.00, '500ml', 50, 'lassi.jpg'),
-('Khoya / Mawa', 'Sweets Base', 'Slow-cooked thickened milk solids for festive sweets.', 380.00, 'Kg', 20, 'khoya.jpg');
+
+

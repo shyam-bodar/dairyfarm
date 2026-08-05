@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/db.php';
 $pageTitle = 'Add Product';
 require_once __DIR__ . '/includes_header.php';
 
@@ -6,14 +7,15 @@ $error   = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name        = trim($_POST['name'] ?? '');
-    $category    = trim($_POST['category'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $price       = (float)($_POST['price'] ?? 0);
-    $unit        = trim($_POST['unit'] ?? '');
-    $stock       = (int)($_POST['stock'] ?? 0);
-    $status      = $_POST['status'] ?? 'active';
-    $imageName   = '';
+    $name         = trim($_POST['name'] ?? '');
+    $category_id  = trim($_POST['category'] ?? '');
+    $category_new = trim($_POST['category_new'] ?? '');
+    $description  = trim($_POST['description'] ?? '');
+    $price        = (float)($_POST['price'] ?? 0);
+    $unit         = trim($_POST['unit'] ?? '');
+    $stock        = (int)($_POST['stock'] ?? 0);
+    $status       = $_POST['status'] ?? 'active';
+    $imageName    = '';
 
     // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
@@ -37,20 +39,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    // If "+ New Category" was chosen, insert it into categories table first
+    if ($error == '' && $category_id === '__new__') {
+        if ($category_new == '') {
+            $error = 'Please type a new category name.';
+        } else {
+            $newCatEsc = mysqli_real_escape_string($conn, $category_new);
+
+            // Check if category already exists (avoid duplicate)
+            $checkRes = mysqli_query($conn, "SELECT id FROM categories WHERE name = '$newCatEsc'");
+            if ($checkRes && mysqli_num_rows($checkRes) > 0) {
+                $row = mysqli_fetch_assoc($checkRes);
+                $category_id = $row['id'];
+            } else {
+                mysqli_query($conn, "INSERT INTO categories (name) VALUES ('$newCatEsc')");
+                if (mysqli_error($conn)) {
+                    $error = 'Failed to create new category: ' . mysqli_error($conn);
+                } else {
+                    $category_id = mysqli_insert_id($conn);
+                }
+            }
+        }
+    }
+
     if ($error == '') {
-        if ($name == '' || $category == '' || $price <= 0) {
+        $category_id = (int)$category_id;
+        if ($name == '' || $category_id <= 0 || $price <= 0) {
             $error = 'Name, category and price are required.';
         } else {
-            $n  = mysqli_real_escape_string($conn, $name);
-            $c  = mysqli_real_escape_string($conn, $category);
-            $d  = mysqli_real_escape_string($conn, $description);
-            $u  = mysqli_real_escape_string($conn, $unit);
-            $s  = mysqli_real_escape_string($conn, $status);
+            $n   = mysqli_real_escape_string($conn, $name);
+            $d   = mysqli_real_escape_string($conn, $description);
+            $u   = mysqli_real_escape_string($conn, $unit);
+            $s   = mysqli_real_escape_string($conn, $status);
             $img = mysqli_real_escape_string($conn, $imageName);
-            mysqli_query($conn, "INSERT INTO products (name, category, description, price, unit, stock, image, status) VALUES ('$n','$c','$d','$price','$u','$stock','$img','$s')");
+            mysqli_query($conn, "INSERT INTO products (name, category_id, description, price, unit, stock, image, status) VALUES ('$n','$category_id','$d','$price','$u','$stock','$img','$s')");
             $success = 'Product added successfully!';
         }
     }
+}
+
+// Fetch categories for dropdown (fresh list, in case a new one was just added)
+$cats = mysqli_query($conn, "SELECT id, name FROM categories ORDER BY name");
+if (!$cats) {
+    die("Category Query Error: " . mysqli_error($conn));
 }
 ?>
 
@@ -78,13 +109,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <select name="category">
           <option value="">-- Select Category --</option>
           <?php
-          $cats = mysqli_query($conn, "SELECT DISTINCT category FROM products ORDER BY category");
+          $selectedCatId = $_POST['category'] ?? '';
           while ($cat = mysqli_fetch_assoc($cats)) {
-              $sel = (($_POST['category'] ?? '') == $cat['category']) ? 'selected' : '';
-              echo '<option value="' . htmlspecialchars($cat['category'] ?? '', ENT_QUOTES, 'UTF-8') . '" ' . $sel . '>' . htmlspecialchars($cat['category'] ?? '', ENT_QUOTES, 'UTF-8') . '</option>';
+              $sel = ($selectedCatId == $cat['id']) ? 'selected' : '';
+              echo '<option value="' . (int)$cat['id'] . '" ' . $sel . '>' . htmlspecialchars($cat['name'] ?? '', ENT_QUOTES, 'UTF-8') . '</option>';
           }
           ?>
-          <option value="__new__">+ New Category (type below)</option>
+          <option value="__new__" <?php echo ($selectedCatId === '__new__') ? 'selected' : ''; ?>>+ New Category (type below)</option>
         </select>
         <input type="text" name="category_new" placeholder="Type new category name" style="margin-top:8px;" value="<?php echo htmlspecialchars($_POST['category_new'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
         <p style="font-size:.75rem;color:var(--muted);margin:4px 0 0;">If typing a new category above, select "+ New Category" in the dropdown.</p>
@@ -133,19 +164,6 @@ document.querySelector('select[name="category"]').addEventListener('change', fun
     if (this.value == '__new__') {
         newInput.style.borderColor = 'var(--pasture)';
         newInput.focus();
-    }
-});
-
-// Before submit: if new category chosen, write it into the select
-document.querySelector('form').addEventListener('submit', function() {
-    var sel = document.querySelector('select[name="category"]');
-    var newVal = document.querySelector('input[name="category_new"]').value.trim();
-    if (sel.value == '__new__' && newVal != '') {
-        var opt = document.createElement('option');
-        opt.value = newVal;
-        opt.text = newVal;
-        opt.selected = true;
-        sel.appendChild(opt);
     }
 });
 </script>

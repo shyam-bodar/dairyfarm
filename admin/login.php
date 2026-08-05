@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Login | Greenpasture Dairy</title>
+<title>Admin Login | KDF Dairy</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="shortcut icon" href="<?php echo SITE_URL; ?>assets/images/logo.png" type="image/png">
 <link rel="stylesheet" href="<?php echo SITE_URL; ?>assets/css/style.css">
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="form-card">
       <div class="center" style="margin-bottom:20px;">
         <span class="eyebrow">Admin Panel</span>
-        <h2>Greenpasture Dairy</h2>
+        <h2>KDF Dairy</h2>
         <p style="color:var(--muted);font-size:.85rem;">Sign in to manage products and orders</p>
       </div>
       <?php if ($error): ?><div class="alert alert-error"><?php echo ($error); ?></div><?php endif; ?>

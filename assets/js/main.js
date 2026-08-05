@@ -15,21 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  document.querySelectorAll('.qty-box').forEach(function (box) {
-    var input = box.querySelector('input');
-    var minus = box.querySelector('.qty-minus');
-    var plus = box.querySelector('.qty-plus');
-    if (!input) return;
-    if (minus) minus.addEventListener('click', function () {
-      input.value = Math.max(1, parseInt(input.value || 1) - 1);
-      input.form && input.form.requestSubmit ? input.form.requestSubmit() : input.form.submit();
-    });
-    if (plus) plus.addEventListener('click', function () {
-      input.value = parseInt(input.value || 1) + 1;
-      input.form && input.form.requestSubmit ? input.form.requestSubmit() : input.form.submit();
-    });
-  });
-
   document.querySelectorAll('.confirm-action').forEach(function (el) {
     el.addEventListener('click', function (e) {
       if (!confirm(el.getAttribute('data-confirm') || 'Are you sure?')) {
@@ -37,4 +22,45 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   });
+});
+
+
+document.querySelectorAll('.qty-box').forEach(function (box) {
+
+    const input = box.querySelector("input");
+    const minus = box.querySelector(".qty-minus");
+    const plus = box.querySelector(".qty-plus");
+
+    if (!input) return;
+
+    const max = parseInt(input.getAttribute("max")) || 9999;
+
+    if (minus) {
+
+        minus.addEventListener("click", function () {
+
+            let value = parseInt(input.value) || 1;
+
+            if (value > 1) {
+                input.value = value - 1;
+            }
+
+        });
+
+    }
+
+    if (plus) {
+
+        plus.addEventListener("click", function () {
+
+            let value = parseInt(input.value) || 1;
+
+            if (value < max) {
+                input.value = value + 1;
+            }
+
+        });
+
+    }
+
 });
