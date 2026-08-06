@@ -7,18 +7,34 @@ require_once __DIR__ . '/includes/header.php';
 $category = isset($_GET['category']) ? $_GET['category'] : '';
 $search   = isset($_GET['q']) ? trim($_GET['q']) : '';
 
-$where = "WHERE status='active'";
+$where = "WHERE p.status='active'";
 if ($category != '') {
     $c = mysqli_real_escape_string($conn, $category);
-    $where .= " AND category='$c'";
+    $where .= " AND c.name='$c'";
 }
 if ($search != '') {
     $s = mysqli_real_escape_string($conn, $search);
-    $where .= " AND name LIKE '%$s%'";
+    $where .= " AND p.name LIKE '%$s%'";
 }
 
-$result  = mysqli_query($conn, "SELECT * FROM products $where ORDER BY created_at DESC");
-$catRes  = mysqli_query($conn, "SELECT DISTINCT category FROM products WHERE status='active' ORDER BY category");
+
+$result = mysqli_query($conn, "
+  SELECT p.*, c.name AS category 
+  FROM products p
+  LEFT JOIN categories c ON p.category_id = c.id
+  $where
+  ORDER BY p.created_at DESC
+");
+
+$catRes = mysqli_query($conn, "
+  SELECT DISTINCT c.name AS category 
+  FROM products p
+  LEFT JOIN categories c ON p.category_id = c.id
+  WHERE p.status='active'
+  ORDER BY c.name
+");
+
+
 ?>
 
 <section class="section-sm" style="padding-top:50px;">

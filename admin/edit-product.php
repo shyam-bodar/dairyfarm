@@ -4,7 +4,12 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/includes_header.php';
 
 $id = (int)($_GET['id'] ?? 0);
-$result  = mysqli_query($conn, "SELECT * FROM products WHERE id=$id");
+$result  = mysqli_query($conn, "
+  SELECT p.*, c.name AS category 
+  FROM products p
+  LEFT JOIN categories c ON p.category_id = c.id
+  WHERE p.id=$id
+");
 $product = mysqli_fetch_assoc($result);
 
 if (!$product) {
@@ -62,7 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $u   = mysqli_real_escape_string($conn, $unit);
             $s   = mysqli_real_escape_string($conn, $status);
             $img = mysqli_real_escape_string($conn, $imageName);
-            mysqli_query($conn, "UPDATE products SET name='$n', category='$c', description='$d', price='$price', unit='$u', stock='$stock', image='$img', status='$s' WHERE id=$id");
+            mysqli_query($conn, "
+              UPDATE products 
+              SET name='$n', category_id='$c', description='$d', price='$price', unit='$u', stock='$stock', image='$img', status='$s' 
+              WHERE id=$id
+            ");
+
             $success = 'Product updated successfully!';
             // Refresh product data
             $product = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM products WHERE id=$id"));
@@ -103,7 +113,12 @@ $hasImage = !empty($product['image']) && file_exists(__DIR__ . '/../assets/image
         <label>Category *</label>
         <select name="category">
           <?php
-          $cats = mysqli_query($conn, "SELECT DISTINCT category FROM products ORDER BY category");
+          $cats = mysqli_query($conn, "SELECT id, name FROM categories ORDER BY name");
+            while ($cat = mysqli_fetch_assoc($cats)) {
+                $sel = ($product['category_id'] == $cat['id']) ? 'selected' : '';
+                echo '<option value="' . $cat['id'] . '" ' . $sel . '>' . htmlspecialchars($cat['name'], ENT_QUOTES, 'UTF-8') . '</option>';
+            }
+
           while ($cat = mysqli_fetch_assoc($cats)) {
               $sel = ($product['category'] == $cat['category']) ? 'selected' : '';
               echo '<option value="' . htmlspecialchars($cat['category'] ?? '', ENT_QUOTES, 'UTF-8') . '" ' . $sel . '>' . htmlspecialchars($cat['category'] ?? '', ENT_QUOTES, 'UTF-8') . '</option>';

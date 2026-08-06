@@ -111,38 +111,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please fill in all shipping details.';
     } else {
         $total = cartTotal();
-        mysqli_begin_transaction($conn);
-        try {
-            $orderId = db_exec(
-                $conn,
-                "INSERT INTO orders (user_id, total_amount, shipping_name, shipping_phone, shipping_address, payment_method, status) VALUES (?,?,?,?,?,?, 'pending')",
-                "idssss",
-                [$_SESSION['user_id'], $total, $name, $phone, $address, $payment]
-            );
+       mysqli_begin_transaction($conn);
+try {
+    // Insert order
+    $orderId = db_exec(
+        $conn,
+        "INSERT INTO orders (user_id, total_amount, payment_method, status) VALUES (?,?,?, 'pending')",
+        "iss",
+        [$_SESSION['user_id'], $total, $payment]
+    );
 
-            foreach ($cart as $pid => $item) {
-                db_exec(
-                    $conn,
-                    "INSERT INTO order_items (order_id, product_id, product_name, price, quantity) VALUES (?,?,?,?,?)",
-                    "iisdi",
-                    [$orderId, $pid, $item['name'], $item['price'], $item['qty']]
-                );
-                db_exec(
-                    $conn,
-                    "UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?",
-                    "ii",
-                    [$item['qty'], $pid]
-                );
-            }
-            mysqli_commit($conn);
-            unset($_SESSION['cart']);
-            flash('order', "Order #$orderId placed successfully! We'll deliver it soon.");
-            header('Location: profile.php');
-            exit;
-        } catch (Exception $e) {
-            mysqli_rollback($conn);
-            $error = 'Something went wrong placing your order. Please try again.';
-        }
+    // Insert shipping details
+    db_exec(
+        $conn,
+        "INSERT INTO shipping_details (order_id, name, phone, address) VALUES (?,?,?,?)",
+        "isss",
+        [$orderId, $name, $phone, $address]
+    );
+
+    // Insert order items
+    foreach ($cart as $pid => $item) {
+        db_exec(
+            $conn,
+            "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?,?,?)",
+            "iii",
+            [$orderId, $pid, $item['qty']]
+        );
+        db_exec(
+            $conn,
+            "UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?",
+            "ii",
+            [$item['qty'], $pid]
+        );
+    }
+
+    mysqli_commit($conn);
+    unset($_SESSION['cart']);
+    flash('order', "Order #$orderId placed successfully!");
+    header('Location: profile.php');
+    exit;
+} catch (Exception $e) {
+    mysqli_rollback($conn);
+    $error = 'Something went wrong: ' . $e->getMessage();
+}
+
+
     }
 }
 

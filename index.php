@@ -4,7 +4,14 @@ $pageTitle = 'Home';
 require_once __DIR__ . '/includes/header.php';
 
 // Featured Products
-$result = mysqli_query($conn, "SELECT * FROM products WHERE status='active' ORDER BY created_at DESC LIMIT 4");
+$result = mysqli_query($conn, "
+  SELECT p.*, c.name AS category
+  FROM products p
+  LEFT JOIN categories c ON p.category_id = c.id
+  WHERE p.status='active'
+  ORDER BY p.created_at DESC
+  LIMIT 4
+");
 
 $featured = [];
 

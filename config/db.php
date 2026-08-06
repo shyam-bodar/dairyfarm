@@ -4,7 +4,7 @@ session_start();
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "dairyfarm";
+$db   = "kdfdairyfarm";
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 

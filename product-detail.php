@@ -2,7 +2,12 @@
 require_once __DIR__ . '/config/db.php';
 
 $id = (int)($_GET['id'] ?? 0);
-$result = mysqli_query($conn, "SELECT * FROM products WHERE id=$id AND status='active'");
+$result = mysqli_query($conn, "
+  SELECT p.*, c.name AS category
+  FROM products p
+  LEFT JOIN categories c ON p.category_id = c.id
+  WHERE p.id=$id AND p.status='active'
+");
 $product = mysqli_fetch_assoc($result);
 
 if (!$product) {
@@ -58,7 +63,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
 $pageTitle = $product['name'];
 require_once __DIR__ . '/includes/header.php';
 
-$relRes = mysqli_query($conn, "SELECT * FROM products WHERE category='" . mysqli_real_escape_string($conn, $product['category']) . "' AND id!=$id AND status='active' LIMIT 4");
+$relRes = mysqli_query($conn, "
+  SELECT p.*, c.name AS category
+  FROM products p
+  LEFT JOIN categories c ON p.category_id = c.id
+  WHERE c.name='" . mysqli_real_escape_string($conn, $product['category']) . "'
+  AND p.id!=$id AND p.status='active'
+  LIMIT 4
+");
+
+if (!$relRes) {
+    die('Related products query error: ' . mysqli_error($conn));
+}
+
 ?>
 
 <section class="section">

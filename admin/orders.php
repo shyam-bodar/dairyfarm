@@ -18,7 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
 }
 
 $filter = $_GET['status'] ?? '';
-$sql = "SELECT o.*, u.name AS customer, u.email FROM orders o JOIN users u ON o.user_id = u.id";
+$sql = "
+  SELECT o.*, u.name AS customer, u.email,
+         s.name AS shipping_name, s.phone AS shipping_phone, s.address AS shipping_address
+  FROM orders o
+  JOIN users u ON o.user_id = u.id
+  LEFT JOIN shipping_details s ON o.id = s.order_id
+";
+
 if ($filter !== '') { $sql .= " WHERE o.status = ?"; }
 $sql .= " ORDER BY o.created_at DESC";
 
@@ -35,7 +42,13 @@ if ($stmt = $conn->prepare($sql)) {
 
 $statuses = ['pending','confirmed','shipped','delivered','cancelled'];
 
-$item_stmt = $conn->prepare("SELECT * FROM order_items WHERE order_id = ?");
+$item_stmt = $conn->prepare("
+  SELECT oi.*, p.name AS product_name, p.price
+  FROM order_items oi
+  JOIN products p ON oi.product_id = p.id
+  WHERE oi.order_id = ?
+");
+
 ?>
 
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
@@ -65,7 +78,11 @@ $item_stmt = $conn->prepare("SELECT * FROM order_items WHERE order_id = ?");
   </div>
   <ul style="margin:14px 0;padding-left:18px;font-size:.88rem;">
     <?php foreach ($items as $it): ?>
-      <li><?php echo ($it['product_name']); ?> × <?php echo $it['quantity']; ?> — <?php echo CURRENCY . number_format($it['price']*$it['quantity'],2); ?></li>
+     <li>
+  <?php echo htmlspecialchars($it['product_name']); ?> × <?php echo $it['quantity']; ?> —
+  <?php echo CURRENCY . number_format($it['price'] * $it['quantity'], 2); ?>
+</li>
+
     <?php endforeach; ?>
   </ul>
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
