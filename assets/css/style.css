@@ -52,6 +52,10 @@ p{margin:0 0 1em;}
 .btn-danger{background:#A3402B;color:#fff;}
 .btn-block{width:100%;}
 
+
+
+
+
 /* ===== Header ===== */
 .site-header{
   position:sticky;top:0;z-index:100;background:rgba(251,246,236,.92);
