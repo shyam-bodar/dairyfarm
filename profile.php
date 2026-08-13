@@ -73,12 +73,15 @@ require_once __DIR__ . '/includes/header.php';
           <p style="color:var(--muted);">No orders yet.</p>
           <a href="products.php" class="btn btn-primary btn-sm">Start Shopping</a>
         <?php else: ?>
-          <?php while ($order = mysqli_fetch_assoc($orders)):
+          <?php
+             $num = 1;
+            while ($order = mysqli_fetch_assoc($orders)):
             $items = mysqli_query($conn, "SELECT * FROM order_items WHERE order_id=" . $order['id']);
           ?>
             <div style="border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;">
               <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-                <strong>Order #<?php echo $order['id']; ?></strong>
+                <strong>Order #<?php echo $num ?></strong>
+                <?php $num++; ?>
                 <span class="status-pill status-<?php echo $order['status']; ?>"><?php echo htmlspecialchars($order['status'] ?? '', ENT_QUOTES, 'UTF-8'); ?></span>
               </div>
               <p style="font-size:.82rem;color:var(--muted);margin:6px 0;"><?php echo date('d M Y, h:i A', strtotime($order['created_at'])); ?></p>

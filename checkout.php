@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config/db.php';
+require_once __DIR__ . '/includes/mailer.php';
 
 // Ensure sessions are started
 if (session_status() === PHP_SESSION_NONE) {
@@ -146,8 +147,35 @@ try {
     }
 
     mysqli_commit($conn);
+
+    // ---- Order Confirmation Email moklo ----
+    $userRow = db_exec($conn, "SELECT name, email FROM users WHERE id = ?", "i", [$_SESSION['user_id']]);
+    if (!empty($userRow)) {
+        $userEmail = $userRow[0]['email'];
+        $userName  = $userRow[0]['name'];
+
+        $emailItems = [];
+        foreach ($cart as $item) {
+            $emailItems[] = [
+                'name'  => $item['name'],
+                'qty'   => $item['qty'],
+                'price' => $item['price'],
+            ];
+        }
+
+        sendOrderConfirmationEmail(
+            $userEmail,
+            $userName,
+            $orderId,
+            $total,
+            $payment,
+            $emailItems,
+            ['name' => $name, 'phone' => $phone, 'address' => $address]
+        );
+    }
+
     unset($_SESSION['cart']);
-    flash('order', "Order #$orderId placed successfully!");
+    flash('order', "Order #$orderId placed successfully! A confirmation email has been sent to your inbox.");
     header('Location: profile.php');
     exit;
 } catch (Exception $e) {
@@ -161,6 +189,10 @@ try {
 
 $pageTitle = 'Checkout';
 require_once __DIR__ . '/includes/header.php';
+
+
+ 
+
 ?>
 
 <section class="section">
@@ -180,14 +212,14 @@ require_once __DIR__ . '/includes/header.php';
         </div>
         <div class="form-group">
           <label>Delivery Address</label>
-          <textarea name="shipping_address" required placeholder="House no, street, area, city, pincode"></textarea>
+          <textarea name="shipping_address" required placeholder="House no, street, area, city, pincode" ></textarea>
         </div>
         <div class="form-group">
           <label>Payment Method</label>
           <select name="payment_method">
             <option value="Cash on Delivery">Cash on Delivery</option>
-            <option value="UPI">UPI</option>
-            <option value="Card on Delivery">Card on Delivery</option>
+            
+           
           </select>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Place Order</button>
