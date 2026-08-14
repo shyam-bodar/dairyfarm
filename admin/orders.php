@@ -2,6 +2,7 @@
 $pageTitle = 'Orders';
 require_once __DIR__ . '/includes_header.php';
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
@@ -12,6 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
     $stmt->bind_param('si', $status, $order_id);
     $stmt->execute();
     $stmt->close();
+
+    // ---- Status update email user ne moklo (confirmed / cancelled / shipped / delivered) ----
+    if ($stmt2 = $conn->prepare(
+      "SELECT u.name AS customer, u.email, o.total_amount
+       FROM orders o JOIN users u ON o.user_id = u.id
+       WHERE o.id = ?"
+    )) {
+      $stmt2->bind_param('i', $order_id);
+      $stmt2->execute();
+      $row = $stmt2->get_result()->fetch_assoc();
+      $stmt2->close();
+
+      if ($row) {
+        sendOrderStatusEmail($row['email'], $row['customer'], $order_id, $status, $row['total_amount']);
+      }
+    }
   }
   header('Location: orders.php');
   exit;
