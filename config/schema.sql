@@ -1,6 +1,6 @@
 -- Create Database
-CREATE DATABASE IF NOT EXISTS dairyfarm CHARACTER SET utf8mb4;
-USE dairyfarm;
+CREATE DATABASE IF NOT EXISTS kdfdairyfarm CHARACTER SET utf8mb4;
+USE kdfdairyfarm;
 
 -- Users Table
 CREATE TABLE users (

@@ -21,7 +21,8 @@ use PHPMailer\PHPMailer\Exception;
 // 2) https://myaccount.google.com/apppasswords par jaine "App Password" banavo
 // 3) Te 16 digit password niche MAIL_PASSWORD ma nakho (normal gmail password nahi chalse)
 define('MAIL_HOST', 'smtp.gmail.com');
-// <-- Gmail App Password
+define('MAIL_USERNAME', '');   // <-- potanu Gmail address
+define('MAIL_PASSWORD', ''); // <-- Gmail App Password
 define('MAIL_PORT', 587);
 define('MAIL_FROM_NAME', 'KD Dairy Farm');
 

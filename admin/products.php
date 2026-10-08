@@ -1,6 +1,8 @@
 <?php
 $pageTitle = 'Products';
 require_once __DIR__ . '/includes_header.php';
+require_once __DIR__ . '/../config/db.php';
+
 
 // Delete product
 if (isset($_GET['delete'])) {
@@ -24,7 +26,12 @@ if (isset($_GET['toggle'])) {
     exit;
 }
 
-$result = mysqli_query($conn, "SELECT * FROM products ORDER BY created_at DESC");
+$result = mysqli_query($conn, "
+    SELECT p.*, c.name AS category
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.id
+    ORDER BY p.created_at DESC
+");
 ?>
 
 <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
