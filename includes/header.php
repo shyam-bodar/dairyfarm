@@ -1,12 +1,12 @@
 <?php
-// Ensure session is started (in case this page didn't already start one)
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 $current = basename($_SERVER['PHP_SELF']);
 
-// Number of items currently in the cart (plain inline PHP, no helper function)
+
 $cartCount = 0;
 if (!empty($_SESSION['cart'])) {
     foreach ($_SESSION['cart'] as $cartItem) {
@@ -14,7 +14,6 @@ if (!empty($_SESSION['cart'])) {
     }
 }
 
-// Is the visitor logged in? (plain inline PHP, no helper function)
 $isLoggedIn = !empty($_SESSION['user_id']) || !empty($_SESSION['user_name']);
 ?>
 <!DOCTYPE html>

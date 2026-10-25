@@ -1,10 +1,4 @@
 <?php
-/**
- * mailer.php
- * -----------
- * Order confirmation + order status update emails ahi thi jay che.
- * Ahi niche apela SMTP settings potana email na hisab e badlo.
- */
 
 require_once __DIR__ . '/PHPMailer/Exception.php';
 require_once __DIR__ . '/PHPMailer/PHPMailer.php';
@@ -13,37 +7,19 @@ require_once __DIR__ . '/PHPMailer/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-// ============================================================
-// 🔧 SMTP SETTINGS — AA VALUES POTANA MUJAB BADLO
-// ============================================================
-// Gmail vaparta ho to:
-// 1) Potana Google Account ma jaine 2-Step Verification ON karo
-// 2) https://myaccount.google.com/apppasswords par jaine "App Password" banavo
-// 3) Te 16 digit password niche MAIL_PASSWORD ma nakho (normal gmail password nahi chalse)
 define('MAIL_HOST', 'smtp.gmail.com');
-define('MAIL_USERNAME', '');   // <-- potanu Gmail address
-define('MAIL_PASSWORD', ''); // <-- Gmail App Password
+define('MAIL_USERNAME', 'bodarshyam731@gmail.com');   
+define('MAIL_PASSWORD', 'wxvi xjrk fxvm qnqq'); 
 define('MAIL_PORT', 587);
 define('MAIL_FROM_NAME', 'KD Dairy Farm');
 
-/**
- * Order confirmation email moklo (jyare user order place kare tyare).
- *
- * @param string $toEmail   User nu email
- * @param string $toName    User nu naam
- * @param int    $orderId   Order ID
- * @param float  $total     Order no total amount
- * @param string $paymentMethod
- * @param array  $items     [ ['name'=>.., 'qty'=>.., 'price'=>..], ... ]
- * @param array  $shipping  ['name'=>.., 'phone'=>.., 'address'=>..]
- * @return bool  true = email mokli gayo, false = error aavi
- */
+
 function sendOrderConfirmationEmail($toEmail, $toName, $orderId, $total, $paymentMethod, $items, $shipping)
 {
     $mail = new PHPMailer(true);
 
     try {
-        // --- Server settings ---
+       
         $mail->isSMTP();
         $mail->Host       = MAIL_HOST;
         $mail->SMTPAuth   = true;
@@ -53,16 +29,15 @@ function sendOrderConfirmationEmail($toEmail, $toName, $orderId, $total, $paymen
         $mail->Port       = MAIL_PORT;
         $mail->CharSet    = 'UTF-8';
 
-        // --- Spam-score ghatadva mate niche na settings ---
+        
         $mail->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);
         $mail->addReplyTo(MAIL_USERNAME, MAIL_FROM_NAME);
         $mail->MessageID = '<' . uniqid('order' . $orderId . '-', true) . '@' . preg_replace('/^.*@/', '', MAIL_USERNAME) . '>';
         $mail->XMailer = ' '; // default "PHPMailer" X-Mailer header kadhi nakho (spammy signal)
 
-        // --- Recipient ---
+        
         $mail->addAddress($toEmail, $toName);
 
-        // --- Build order items table (HTML) ---
         $rows = '';
         foreach ($items as $item) {
             $lineTotal = $item['price'] * $item['qty'];
@@ -74,7 +49,6 @@ function sendOrderConfirmationEmail($toEmail, $toName, $orderId, $total, $paymen
             </tr>';
         }
 
-        // --- Email content ---
         $mail->isHTML(true);
         $mail->Subject = "Order #$orderId confirmed - KD Dairy Farm";
         $mail->Body = "
@@ -128,20 +102,9 @@ function sendOrderConfirmationEmail($toEmail, $toName, $orderId, $total, $paymen
         return false;
     }
 }
-
-/**
- * Order status update email moklo (jyare admin order confirm/cancel/shipped/delivered kare).
- *
- * @param string $toEmail   User nu email
- * @param string $toName    User nu naam
- * @param int    $orderId   Order ID
- * @param string $status    'confirmed' | 'cancelled' | 'shipped' | 'delivered'
- * @param float  $total     Order no total amount
- * @return bool  true = email mokli gayo, false = error aavi
- */
 function sendOrderStatusEmail($toEmail, $toName, $orderId, $status, $total)
 {
-    // Dareka status mate subject, heading, message ane color set karo
+
     $statusInfo = [
         'confirmed' => [
             'subject' => "Order #$orderId confirmed - KD Dairy Farm",
@@ -169,7 +132,7 @@ function sendOrderStatusEmail($toEmail, $toName, $orderId, $status, $total)
         ],
     ];
 
-    // Agar aa status list ma nathi (jem ke 'pending'), to email moklo j nahi
+
     if (!isset($statusInfo[$status])) {
         return false;
     }
@@ -178,7 +141,7 @@ function sendOrderStatusEmail($toEmail, $toName, $orderId, $status, $total)
     $mail = new PHPMailer(true);
 
     try {
-        // --- Server settings ---
+       
         $mail->isSMTP();
         $mail->Host       = MAIL_HOST;
         $mail->SMTPAuth   = true;
@@ -188,13 +151,13 @@ function sendOrderStatusEmail($toEmail, $toName, $orderId, $status, $total)
         $mail->Port       = MAIL_PORT;
         $mail->CharSet    = 'UTF-8';
 
-        // --- Spam-score ghatadva mate niche na settings ---
+       
         $mail->setFrom(MAIL_USERNAME, MAIL_FROM_NAME);
         $mail->addReplyTo(MAIL_USERNAME, MAIL_FROM_NAME);
         $mail->MessageID = '<' . uniqid('order' . $orderId . '-', true) . '@' . preg_replace('/^.*@/', '', MAIL_USERNAME) . '>';
         $mail->XMailer = ' ';
 
-        // --- Recipient ---
+        
         $mail->addAddress($toEmail, $toName);
         $mail->isHTML(true);
 

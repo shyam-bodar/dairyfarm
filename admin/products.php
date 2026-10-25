@@ -4,10 +4,8 @@ require_once __DIR__ . '/includes_header.php';
 require_once __DIR__ . '/../config/db.php';
 
 
-// Delete product
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    // Also delete the image file
     $row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT image FROM products WHERE id=$id"));
     if ($row && $row['image'] != '' && $row['image'] != 'default.jpg') {
         $imgPath = __DIR__ . '/../assets/images/products/' . $row['image'];
@@ -18,7 +16,6 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Toggle active/inactive
 if (isset($_GET['toggle'])) {
     $id = (int)$_GET['toggle'];
     mysqli_query($conn, "UPDATE products SET status = IF(status='active','inactive','active') WHERE id=$id");

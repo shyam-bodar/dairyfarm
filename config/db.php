@@ -14,7 +14,6 @@ if (!$conn) {
 
 mysqli_set_charset($conn, "utf8mb4");
 
-// Auto-detect base URL (works in root or subfolder)
 $projectRoot = str_replace('\\', '/', dirname(__DIR__));
 $docRoot     = str_replace('\\', '/', rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/'));
 if ($docRoot !== '' && strpos($projectRoot, $docRoot) === 0) {

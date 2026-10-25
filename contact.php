@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please enter a valid email address.';
     } else {
         
-        // Insert contact into database. Use db_exec if available, otherwise use mysqli prepared statement.
+       
         if (function_exists('db_exec')) {
           db_exec($conn, "INSERT INTO contacts (name, email, message) VALUES (?,?,?)", "sss", [$name, $email, $message]);
         } else {
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $error = 'Failed to save message.';
             }
           } else {
-            // Unknown DB connection type
+           
             $error = 'Database connection not available.';
           }
         }

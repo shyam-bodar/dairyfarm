@@ -2,15 +2,14 @@
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/mailer.php';
 
-// Ensure sessions are started
+
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 
-// Include common functions if available
+
 @include_once __DIR__ . '/includes/functions.php';
 
-// Provide a fallback requireLogin if it's not defined in includes/functions.php
 if (!function_exists('requireLogin')) {
   function requireLogin()
   {
@@ -21,7 +20,6 @@ if (!function_exists('requireLogin')) {
   }
 }
 
-// Provide a fallback cartTotal if it's not defined in includes/functions.php
 if (!function_exists('cartTotal')) {
   function cartTotal()
   {
@@ -36,14 +34,8 @@ if (!function_exists('cartTotal')) {
   }
 }
 
-// Provide a fallback db_exec if it's not defined in includes/functions.php
 if (!function_exists('db_exec')) {
-  /**
-   * Simple wrapper to prepare, bind and execute mysqli statements.
-   * - $types is a string like "is" or "idssss" matching $params
-   * - Returns insert id for INSERT, true for other successful statements,
-   *   or fetched rows for SELECT queries.
-   */
+  
   function db_exec($conn, $sql, $types = null, $params = [])
   {
     $stmt = mysqli_prepare($conn, $sql);
@@ -51,7 +43,7 @@ if (!function_exists('db_exec')) {
       throw new Exception('DB prepare failed: ' . mysqli_error($conn));
     }
     if ($types && $params) {
-      // mysqli_stmt_bind_param requires references
+     
       $bind_names[] = $types;
       for ($i = 0; $i < count($params); $i++) {
         $bind_name = 'bind' . $i;
@@ -82,7 +74,6 @@ if (!function_exists('db_exec')) {
   }
 }
 
-// Provide a fallback flash helper if it's not defined in includes/functions.php
 if (!function_exists('flash')) {
   function flash($key, $message)
   {
@@ -114,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $total = cartTotal();
        mysqli_begin_transaction($conn);
 try {
-    // Insert order
+   
     $orderId = db_exec(
         $conn,
         "INSERT INTO orders (user_id, total_amount, payment_method, status) VALUES (?,?,?, 'pending')",
@@ -122,7 +113,7 @@ try {
         [$_SESSION['user_id'], $total, $payment]
     );
 
-    // Insert shipping details
+   
     db_exec(
         $conn,
         "INSERT INTO shipping_details (order_id, name, phone, address) VALUES (?,?,?,?)",
@@ -130,7 +121,7 @@ try {
         [$orderId, $name, $phone, $address]
     );
 
-    // Insert order items
+ 
     foreach ($cart as $pid => $item) {
         db_exec(
             $conn,
@@ -148,7 +139,7 @@ try {
 
     mysqli_commit($conn);
 
-    // ---- Order Confirmation Email moklo ----
+   
     $userRow = db_exec($conn, "SELECT name, email FROM users WHERE id = ?", "i", [$_SESSION['user_id']]);
     if (!empty($userRow)) {
         $userEmail = $userRow[0]['email'];

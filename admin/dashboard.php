@@ -3,7 +3,6 @@ $pageTitle = 'Dashboard';
 require_once __DIR__ . '/includes_header.php';
 require_once __DIR__ . '/../config/db.php';
 
-// Fallback helpers if the app's DB helpers are not loaded
 if (!function_exists('db_value')) {
   function db_value($conn, $sql) {
     $res = mysqli_query($conn, $sql);

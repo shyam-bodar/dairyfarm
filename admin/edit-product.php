@@ -80,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Figure out current image path for preview
 $hasImage = !empty($product['image']) && file_exists(__DIR__ . '/../assets/images/products/' . $product['image']);
 ?>
 

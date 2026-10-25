@@ -23,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
         $qty = 1;
     }
 
-    /* Stock કરતાં વધુ Quantity ન જાય */
     if ($qty > $product['stock']) {
         $qty = $product['stock'];
     }
@@ -36,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
 
         $newQty = $_SESSION['cart'][$id]['qty'] + $qty;
 
-        /* Cart ની Total Quantity પણ Stock કરતાં વધુ ન થાય */
         if ($newQty > $product['stock']) {
             $newQty = $product['stock'];
         }

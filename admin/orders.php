@@ -6,7 +6,6 @@ require_once __DIR__ . '/../includes/mailer.php';
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
-  // Use mysqli prepared statement instead of undefined db_exec
   $status = $_POST['status'] ?? '';
   $order_id = (int)($_POST['order_id']);
   if ($stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?")) {
@@ -14,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order_id'])) {
     $stmt->execute();
     $stmt->close();
 
-    // ---- Status update email user ne moklo (confirmed / cancelled / shipped / delivered) ----
+   
     if ($stmt2 = $conn->prepare(
       "SELECT u.name AS customer, u.email, o.total_amount
        FROM orders o JOIN users u ON o.user_id = u.id

@@ -3,7 +3,6 @@ require_once __DIR__ . '/config/db.php';
 $pageTitle = 'Home';
 require_once __DIR__ . '/includes/header.php';
 
-// Featured Products
 $result = mysqli_query($conn, "
   SELECT p.*, c.name AS category
   FROM products p

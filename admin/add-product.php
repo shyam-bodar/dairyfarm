@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $status       = $_POST['status'] ?? 'active';
     $imageName    = '';
 
-    // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $allowedTypes = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp');
         $fileType     = $_FILES['image']['type'];
@@ -39,14 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // If "+ New Category" was chosen, insert it into categories table first
     if ($error == '' && $category_id === '__new__') {
         if ($category_new == '') {
             $error = 'Please type a new category name.';
         } else {
             $newCatEsc = mysqli_real_escape_string($conn, $category_new);
 
-            // Check if category already exists (avoid duplicate)
             $checkRes = mysqli_query($conn, "SELECT id FROM categories WHERE name = '$newCatEsc'");
             if ($checkRes && mysqli_num_rows($checkRes) > 0) {
                 $row = mysqli_fetch_assoc($checkRes);
@@ -78,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Fetch categories for dropdown (fresh list, in case a new one was just added)
+
 $cats = mysqli_query($conn, "SELECT id, name FROM categories ORDER BY name");
 if (!$cats) {
     die("Category Query Error: " . mysqli_error($conn));
@@ -90,7 +87,7 @@ if (!$cats) {
   <?php if ($success != '') echo '<div class="alert alert-success">' . htmlspecialchars($success ?? '', ENT_QUOTES, 'UTF-8') . ' <a href="products.php">Back to products</a></div>'; ?>
 
   <form method="post" enctype="multipart/form-data">
-    <!-- Product Image Upload -->
+  
     <div class="form-group">
       <label>Product Image</label>
       <div style="border:2px dashed var(--line);border-radius:12px;padding:24px;text-align:center;background:var(--cream);">
@@ -158,7 +155,6 @@ function previewImage(input) {
     }
 }
 
-// Handle "new category" selection
 document.querySelector('select[name="category"]').addEventListener('change', function() {
     var newInput = document.querySelector('input[name="category_new"]');
     if (this.value == '__new__') {

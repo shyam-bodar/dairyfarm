@@ -1,8 +1,8 @@
--- Create Database
+
 CREATE DATABASE IF NOT EXISTS kdfdairyfarm CHARACTER SET utf8mb4;
 USE kdfdairyfarm;
 
--- Users Table
+
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
@@ -14,13 +14,12 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Categories Table (for product categories)
 CREATE TABLE categories (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- Products Table
+
 CREATE TABLE products (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
@@ -35,7 +34,6 @@ CREATE TABLE products (
   FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
--- Orders Table
 CREATE TABLE orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -46,7 +44,7 @@ CREATE TABLE orders (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Shipping Details Table (normalized shipping info)
+
 CREATE TABLE shipping_details (
   id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
@@ -56,7 +54,7 @@ CREATE TABLE shipping_details (
   FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
 
--- Order Items Table
+
 CREATE TABLE order_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   order_id INT NOT NULL,
@@ -66,7 +64,6 @@ CREATE TABLE order_items (
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- Contacts Table
 CREATE TABLE contacts (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100),
@@ -75,6 +72,5 @@ CREATE TABLE contacts (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Default admin login
 INSERT INTO users (name, email, phone, password, role) VALUES
 ('Admin', 'admin@dairyfarm.com', '9999999999', 'admin123', 'admin');
