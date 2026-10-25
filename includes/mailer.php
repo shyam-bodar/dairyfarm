@@ -9,7 +9,7 @@ use PHPMailer\PHPMailer\Exception;
 
 define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_USERNAME', 'bodarshyam731@gmail.com');   
-define('MAIL_PASSWORD', 'wxvi xjrk fxvm qnqq'); 
+define('MAIL_PASSWORD', ''); 
 define('MAIL_PORT', 587);
 define('MAIL_FROM_NAME', 'KD Dairy Farm');
 
